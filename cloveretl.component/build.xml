@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="org.dwhworks.component">
+
+  <dirname property="project.dir" file="${ant.file}"/>
+
+  <property name="project.build" location="${project.dir}/build"/>
+  <property name="plugin.build" location="${project.build}/${ant.project.name}"/>
+  <property name="plugin.dist" location="${project.dir}/dist"/>
+  <!-- property name="project.bin" location="${project.dir}/bin"/ -->
+  <property name="project.classes" location="${project.dir}/classes"/>
+  <property name="project.src" location="${project.dir}/src"/>
+  <property name="project.doc" location="${project.dir}/doc"/>
+  <property name="project.lib" location="${project.dir}/lib"/>
+  <property name="project.icons" location="${project.dir}/icons"/>
+  <property name="project.jar" location="${plugin.build}/${ant.project.name}.jar"/>
+  <property name="project.zip" location="${plugin.dist}/${ant.project.name}.zip"/>
+  <property name="project.src.zip" location="${plugin.build}/${ant.project.name}.src.zip"/>
+
+  <property name="target" value="1.8"/>
+  <property name="source" value="1.8"/>
+
+  <path id="project.classpath">
+    <fileset dir="${project.lib}" includes="*.jar"/>
+  </path>
+
+  <path id="project.source">
+    <pathelement path="${project.src}"/>
+  </path>
+
+  <target name="init">
+    <mkdir dir="${project.build}"/>
+    <mkdir dir="${plugin.build}"/>
+    <mkdir dir="${plugin.dist}"/>
+    <!-- mkdir dir="${project.bin}"/ -->
+    <mkdir dir="${project.classes}"/>
+    <mkdir dir="${project.doc}"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac destdir="${project.classes}" includeantruntime="false" debug="false">
+      <src refid="project.source"/>
+      <classpath>
+        <path refid="project.classpath"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="${project.jar}">
+      <fileset dir="${project.classes}" includes="**/**"/>
+    </jar>
+  </target>
+
+  <target name="copy-dependencies">
+    <copy todir="${plugin.build}/lib">
+      <fileset dir="${project.lib}" includes="**" excludes="cloveretl.engine.jar"/>
+      <fileset dir="${project.lib}" includes="**" excludes="cloveretl.component.jar"/>
+    </copy>
+  </target>
+
+  <target name="zip" depends="jar, copy-dependencies">
+    <copy todir="${plugin.build}">
+      <fileset dir="${project.dir}" includes="plugin.xml"/>
+    </copy>
+    <copy todir="${plugin.build}/icons">
+      <fileset dir="${project.icons}" includes="**/**"/>
+    </copy>
+    <zip destfile="${project.zip}">
+      <zipfileset dir="${project.build}" includes="**/**" excludes="classes"/>
+    </zip>
+  </target>
+
+  <target name="sources">
+    <zip destfile="${project.src.zip}">
+      <zipfileset dir="${project.src}" includes="**/**"/>
+    </zip>
+  </target>
+
+  <target name="clean">
+    <delete dir="${project.bin}"/>
+    <delete dir="${project.classes}"/>
+    <delete dir="${project.build}"/>
+    <delete file="${project.zip}"/>
+    <delete file="${project.src.zip}"/>
+  </target>
+
+  <target name="build" depends="clean, zip, sources"/>
+
+  <target name="doc" depends="init" description="generate documentation">
+    <javadoc sourcepath="${project.src}" destdir="${project.doc}"/>
+  </target>
+
+</project>
