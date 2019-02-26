@@ -1,2 +1,5 @@
-# CloverETL-Plugins
-Additional components for CloverETL Engine
+CloverETL Plugins
+==================
+
+Additional components for CloverETL Engine.
+
