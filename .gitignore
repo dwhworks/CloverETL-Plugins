@@ -1,0 +1,11 @@
+*.swp
+*.*~
+*.un~
+~*.*
+zz
+yy
+_.swo
+generated-files
+*.pyc
+.job_lock
+credentials.config
