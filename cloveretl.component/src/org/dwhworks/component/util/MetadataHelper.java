@@ -110,7 +110,7 @@ public class MetadataHelper {
    * @param dataRecord a record that contains data
    * @param fields     list of fields to format
    * @param log        logger
-   * @return formatted field values that specified in fields list
+   * @return formatted field values that are specified in fields list
    */
   public Map<String, String> getFormattedFieldValues(DataRecordMetadata metadata, DataRecord dataRecord,
                                                      List<String> fields, Logger log) {

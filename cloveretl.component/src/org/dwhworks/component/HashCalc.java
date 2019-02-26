@@ -32,24 +32,53 @@ import java.util.*;
  * <tr><td><h4><i>Category:</i></h4></td>
  * <td>Custom</td></tr>
  * <tr><td><h4><i>Description:</i></h4></td>
- * <td>Takes any record as input, calculates `KEY_HASH` and `MEASURE_HASH` and outputs the original record with two additional fields as strings.</td></tr>
+ * <td>Receives data through connected input port and calculates
+          two 'hash' values for a record: the 'KEY_HASH' and 'MEASURE_HASH'.
+          KEY_HASH is commonly used as a records's primary key if the natural key contains more than one column.
+
+          MEASURE_HASH is essentially a checksum of all non-key values for the record.
+          It is used for determining later if the record was really changed without comparing
+          all field values, thus increasing the speed of such comparison and saving on manual labour.
+          A hash may be a plain concatenation of field values, or an MD5 sum of such concatenation.</td></tr>
  * </table>
  * <br>
  * <table border="1">
  * <th>XML attributes:</th>
  * <tr><td><b>id</b></td><td>component identification</td>
  * <tr><td><b>type</b></td><td>"HASH_CALC"</td></tr>
- * <tr><td><b>keyHashFields</b></td><td>list of key hash fields separated by semicolon</td></tr>
- * <tr><td><b>measureHashFields</b></td><td>list of measure hash fields separated by semicolon</td></tr>
- * <tr><td><b>ignoreFields</b></td><td>list of fields to ignore when calculating hashes</td></tr>
- * <tr><td><b>hashFunction</b></td><td>md5 or raw (by default md5 will be used)</td></tr>
- * <tr><td><b>keyHashFieldName</b></td><td>field name for key hash</td></tr>
- * <tr><td><b>measureHashFieldName</b></td><td>field name for measure hash</td></tr>
- * <tr><td><b>printDebugInfo</b></td><td>print debug info on debug logging level if true (default - false)</td></tr>
+ * <tr><td><b>keyHashFields</b></td><td>Fields used for KEY_HASH calculation, separated by semicolon.</td></tr>
+ * 
+ * <tr>
+ *   <td><b>measureHashFields</b></td>
+ *   <td>Fields used for MEASURE_HASH calculation, separated by semicolon. If this attribute is not specified,
+ *   all fields, not included into keyHashFields and ignoreFields will be used.
+ *   In this case the sequence of values will be the same as the sequence of fields declared in record metadata.
+ *   This default behaviour may be handy if we want the same graph to process records with
+ *   different structure.
+ *   </td>
+ * </tr>
+ * 
+ * <tr><td><b>ignoreFields</b></td><td>Fields to be ignored in hash calculations.</td></tr>
+ * <tr><td><b>hashFunction</b></td><td>'md5' or 'raw' (by default md5 will be used). Raw means all field values will be concatenated using '-' (hyphen) as a separator and returned without actual hashing</td></tr>
+ * <tr><td><b>keyHashFieldName</b></td><td>Field name to be used for storing KEY_HASH</td></tr>
+ * <tr><td><b>measureHashFieldName</b></td><td>Field name to be used for storing MEASURE_HASH</td></tr>
+ * <tr><td><b>printDebugInfo</b></td><td>Print debug info on DEBUG logging level. Prints hash values for each record</td></tr>
  * </table>
  *
  * <h4>Example:</h4>
  * <pre>&lt;Node id="HASH_CALCULATION" type="HASH_CALC" keyHashFields="mfr_name;mfr_inn;mfr_kpp" measureHashFieldsFields="mfr_address" hashFunction="md5" keyHashFieldName="key_hash" measureHashFieldName="measure_hash"/&gt;</pre>
+ *
+ * <p>Output record must contain two fields for key_hash and measure_hash values. The names of these fields
+ * are specified in keyHashFieldName and measureHashFieldName attributes.
+ * <code>md5</code> hash is returned as a 32-character string in lowercase.
+ * <code>raw</code> hash is a string, containing of all field values concatenated together using hyphen "-" as a separator.
+ * When md5 is specified as hashFunction, first the raw hash is calculated and then the resulting value
+ * is md5-hashed.
+ *
+ * NULLs are interpreted as empty strings.
+ * Date and time are converted to string according to format specified in incoming metadata.
+ * Numeric values are converted to string according to format specified in incoming metadata.
+ * </p>
  *
  * @author Nikita Skotnikov
  * @since 23.03.2018
