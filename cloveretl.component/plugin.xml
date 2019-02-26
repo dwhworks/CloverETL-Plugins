@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="org.dwhworks.component" 
+        version="1.0.0" 
+        provider-name="DWH Works">
+
+  <runtime>
+    <!-- library path="biz.redfrigate.clover.components.jar"/ -->
+    <!-- library path="lib/aws-java-sdk-core-1.11.308.jar"/ -->
+    <!-- library path="lib/aws-java-sdk-s3-1.11.308.jar"/ -->
+    <library path="lib/commons-codec-1.10.jar"/>
+    <library path="lib/commons-io-2.6.jar"/>
+    <!-- library path="lib/force-partner-api-44.0.0.jar"/ -->
+    <!-- library path="lib/force-wsc-44.0.0.jar"/ -->
+    <!-- library path="lib/jackson-core-asl-1.9.13.jar"/ -->
+    <!-- library path="lib/jackson-mapper-asl-1.9.13.jar"/ -->
+    <library path="lib/log4j-1.2.17.jar"/>
+    <!-- library path="lib/RedshiftJDBC42-no-awssdk-1.2.15.1025.jar"/ -->
+  </runtime>
+
+  <requires engine-version="4.8.1">
+    <import plugin-id="org.jetel.engine"/>
+    <import plugin-id="org.jetel.component"/>
+  </requires>
+
+  <extension point-id="component">
+    <ETLComponent category="Custom" 
+                  className="org.dwhworks.component.HashCalc" 
+                  name="Hash Calculator"
+                  type="HASH_CALC" 
+                  iconPath="icons/hash_calc.png">
+
+        <shortDescription>Calculates key and measure hash codes for a record</shortDescription>
+
+        <description>Receives data through connected input port and calculates
+          two 'hash' values for a record: the 'KEY_HASH' and 'MEASURE_HASH'.
+          KEY_HASH is commonly used as a records's primary key if the key contains more than one column.
+
+          MEASURE_HASH is essentially a checksum of all non-key values for the record.
+          It is used for determining later if the record was really changed without comparing
+          all field values, thus increasing the speed of such comparison and saving on manual labour.
+          A hash may be a concatenation of field values, or an MD5 sum of such concatenation.
+        </description>
+
+        <inputPorts>
+          <singlePort name="0" required="true"/>
+        </inputPorts>
+
+        <outputPorts>
+          <multiplePort required="true"/>
+        </outputPorts>
+
+        <properties>
+          <property category="basic" name="keyHashFields"
+                    displayName="Key hash fields" 
+                    modifiable="true" nullable="false"
+                    defaultHint="Fields used for KEY_HASH calculation, separated by semicolon">
+          <singleType name="string"/>
+        </property>
+
+        <property category="basic" name="measureHashFields"
+                  displayName="Measure hash fields" 
+                  modifiable="true" 
+                  nullable="true" 
+                  defaultHint="Fields used for MEASURE_HASH calculation, separated by semicolon">
+          <singleType name="string"/>
+        </property>
+
+        <property category="basic" name="ignoreFields"
+                  displayName="Ignore fields" 
+                  modifiable="true"
+                  nullable="true"
+                  defaultHint="Fields to be ignored in MEASURE_HASH calculation, if measure hash fields are not set explicitly">
+          <singleType name="string"/>
+        </property>
+
+        <property category="basic" name="hashFunction"
+                  displayName="Hash function" 
+                  modifiable="true"  
+                  nullable="true"
+                  defaultHint="Hash function to be used for calculation - either raw - i.e. unencrypted field values, or md5">
+          <singleType name="string"/>
+        </property>
+
+        <property category="basic" name="keyHashFieldName"
+                  displayName="Key hash field name" 
+                  modifiable="true" 
+                  nullable="false"
+                  defaultHint="Field name to be used for storing KEY_HASH">
+          <singleType name="string"/>
+        </property>
+
+        <property category="basic"  name="measureHashFieldName"
+                  displayName="Measure hash field name" 
+                  modifiable="true"
+                  nullable="false" 
+                  defaultHint="Field name to be used for storing MEASURE_HASH">
+          <singleType name="string"/>
+        </property>
+
+        <property category="basic" name="printDebugInfo"
+                  displayName="Print debug info" 
+                  modifiable="true"
+                  nullable="true" 
+                  defaultHint="Print debug info as INFO messages. Convenient for use on live system without reconfiguring logging to debug level">
+          <singleType name="boolean"/>
+        </property>
+      </properties>
+
+    </ETLComponent>
+  </extension>
+
+</plugin>
